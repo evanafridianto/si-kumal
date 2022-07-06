@@ -15,10 +15,10 @@ const Culinary = db.define(
       type: DataTypes.STRING,
     },
     lat: {
-      type: DataTypes.TEXT,
+      type: DataTypes.DOUBLE,
     },
     long: {
-      type: DataTypes.TEXT,
+      type: DataTypes.DOUBLE,
     },
     price_range: {
       type: DataTypes.STRING,
