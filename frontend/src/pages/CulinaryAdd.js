@@ -65,16 +65,14 @@ const CulinaryAdd = () => {
         navigate("/culinaries");
       });
     } catch (error) {
-      error.response.data.errors.forEach((res) => {
-        toast.warn("The " + res.param + res.msg, {
-          position: "top-right",
-          autoClose: 4000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+      toast.warn(error.response.data.message, {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
       });
     }
   };
@@ -98,16 +96,6 @@ const CulinaryAdd = () => {
             <FontAwesomeIcon icon={faArrowAltCircleLeft} fixedWidth />
             Back to Data List
           </Button>
-          {/* {typeof alert != "undefined" ? (
-            <Alert variant="warning">
-              <Alert.Heading>Oh snap! You got an error!</Alert.Heading>
-              {alert.forEach((error) => {
-                <p>{error.msg}</p>;
-              })}
-            </Alert>
-          ) : (
-            ""
-          )} */}
           <Form className="row g-3" onSubmit={store}>
             <Col md="12">
               <Form.Label>Name</Form.Label>
@@ -179,7 +167,7 @@ const CulinaryAdd = () => {
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
               >
-                <option value="Uncategorized">Uncategorized</option>
+                <option value="">Select category</option>
                 <option value="KAFE">KAFE</option>
                 <option value="KEDAI">KEDAI</option>
                 <option value="CASUAL DINING">CASUAL DINING</option>

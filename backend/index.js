@@ -20,7 +20,7 @@ app.use(FileUpload());
 app.use(express.static("public"));
 
 app.use(CulinaryRoute);
-// app.use("/culinary", CulinaryRoute);
+// app.use("api", CulinaryRoute);
 
 app.listen(2000, () => {
   console.log("server up and running at port 2000");

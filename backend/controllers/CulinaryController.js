@@ -27,6 +27,14 @@ export const getDataById = async (req, res) => {
 };
 
 export const createData = async (req, res) => {
+  let fileName = "";
+  const image = req.files.photo;
+  const ext = path.extname(image.name);
+  fileName = image.md5 + ext;
+  image.mv(`./public/images/${fileName}`, async (err) => {
+    if (err) return res.status(500).json({ msg: err.message });
+  });
+
   const name = req.body.name;
   const urban_village = req.body.urban_village;
   const address = req.body.address;
@@ -35,26 +43,6 @@ export const createData = async (req, res) => {
   const price_range = req.body.price_range;
   const open_time = req.body.open_time;
   const category = req.body.category;
-  let fileName = "";
-
-  if (req.files === null) {
-    fileName = null;
-  } else {
-    const photo = req.files.photo;
-    const fileSize = photo.data.length;
-    const ext = path.extname(photo.name);
-    fileName = photo.md5 + ext;
-    const allowedType = [".png", ".jpg", ".jpeg"];
-
-    if (!allowedType.includes(ext.toLowerCase()))
-      return res.status(422).json({ msg: "Invalid Images" });
-    if (fileSize > 5000000)
-      return res.status(422).json({ msg: "Image must be less than 5 MB" });
-
-    photo.mv(`./public/images/${fileName}`, async (err) => {
-      if (err) return res.status(500).json({ msg: err.message });
-    });
-  }
 
   try {
     await Culinary.create({
@@ -68,11 +56,12 @@ export const createData = async (req, res) => {
       category: category,
       photo: fileName,
     });
-    res.json({
-      message: "Data updated successfully!",
+    res.status(200).json({
+      success: true,
+      message: "Data created successfully",
     });
   } catch (error) {
-    console.log(error.message);
+    res.json({ success: false, message: error.message });
   }
 };
 
@@ -154,21 +143,22 @@ export const deleteData = async (req, res) => {
       id: req.params.id,
     },
   });
-  if (!culinary) return res.status(404).json({ msg: "No Data Found" });
-  try {
-    const filepath = `./public/images/${culinary.photo}`;
-    if (fs.existsSync(filepath)) {
-      fs.unlinkSync(filepath);
+  if (culinary) {
+    try {
+      const filepath = `./public/images/${culinary.photo}`;
+      if (culinary.photo !== "" && fs.existsSync(filepath)) {
+        fs.unlinkSync(filepath);
+      }
+      await Culinary.destroy({
+        where: {
+          id: req.params.id,
+        },
+      });
+      res.json({
+        message: "Data deleted successfully!",
+      });
+    } catch (error) {
+      res.json({ message: error.message });
     }
-    await Culinary.destroy({
-      where: {
-        id: req.params.id,
-      },
-    });
-    res.json({
-      message: "Data deleted successfully!",
-    });
-  } catch (error) {
-    res.json({ message: error.message });
   }
 };
