@@ -33,43 +33,45 @@ export const validator = [
     .withMessage("The category " + msg),
 ];
 
-export const validateFile = (req, res, next) => {
-  if (req.files === null) {
-    return res.status(400).json({
-      success: false,
-      message: "No Image selected",
-    });
-  }
-
-  const image = req.files.photo;
-  const fileSize = image.data.length;
-  const allowedType = [".png", ".jpg", ".jpeg"];
-  const ext = path.extname(image.name);
-
-  if (!allowedType.includes(ext)) {
-    return res.json({
-      success: false,
-      message: "Image ext is not valid",
-    });
-  }
-  if (fileSize > 5000000) {
-    return res.json({
-      success: false,
-      message: "Image must be less than 5 MB",
-    });
-  }
-  next();
-};
-
 export const result = (req, res, next) => {
   const errors = validationResult(req);
   const hasError = !errors.isEmpty();
 
   if (hasError) {
-    return res.status(422).json({
+    return res.status(412).json({
       success: false,
-      errors: errors.array()[0].msg,
+      message: errors.array()[0].msg,
     });
+  }
+  next();
+};
+
+export const validateFile = (req, res, next) => {
+  // if (req.files === null) {
+  if (req.files !== null) {
+    // return res.status(412).json({
+    //   success: false,
+    //   message: "No Image selected",
+    // });
+
+    const image = req.files.photo;
+    const fileSize = image.data.length;
+    const allowedType = [".png", ".jpg", ".jpeg"];
+    const ext = path.extname(image.name);
+
+    if (!allowedType.includes(ext)) {
+      return res.status(412).json({
+        success: false,
+        message: "Image ext is not valid",
+      });
+    }
+    if (fileSize > 5000000) {
+      return res.status(412).json({
+        success: false,
+        message: "Image must be less than 5 MB",
+      });
+    }
+    // next();
   }
   next();
 };

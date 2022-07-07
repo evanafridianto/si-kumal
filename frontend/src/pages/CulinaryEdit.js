@@ -7,6 +7,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowAltCircleLeft } from "@fortawesome/free-solid-svg-icons";
 import { Helmet } from "react-helmet";
+import { toast, ToastContainer } from "react-toastify";
 
 const CulinaryEdit = () => {
   const [name, setName] = useState("");
@@ -18,9 +19,10 @@ const CulinaryEdit = () => {
   const [open_time, setOpenTime] = useState("");
   const [category, setCategory] = useState("");
   const [photo, setPhoto] = useState("");
-
   const [preview, setPreview] = useState("");
+
   const navigate = useNavigate();
+
   const { id } = useParams();
 
   useEffect(() => {
@@ -38,56 +40,66 @@ const CulinaryEdit = () => {
     setPriceRange(response.data.price_range);
     setOpenTime(response.data.open_time);
     setCategory(response.data.category);
+    setPhoto(response.data.photo);
     setPreview(`http://localhost:2000/images/${response.data.photo}`);
   };
 
-  // store
-  const store = async (e) => {
-    e.preventDefault();
-    var response = "";
-    if (id === undefined) {
-      response = await axios.post("http://localhost:2000/culinary/create", {
-        name: name,
-        urban_village: urban_village,
-        address: address,
-        lat: lat,
-        long: long,
-        price_range: price_range,
-        open_time: open_time,
-        category: category,
-        photo: photo,
-      });
-    } else {
-      response = await axios.patch(`http://localhost:2000/culinary/${id}`, {
-        name: name,
-        urban_village: urban_village,
-        address: address,
-        lat: lat,
-        long: long,
-        price_range: price_range,
-        open_time: open_time,
-        category: category,
-        photo: photo,
-      });
-    }
-    Swal.fire({
-      title: "Good job!",
-      text: response.data.message,
-      icon: "success",
-      showConfirmButton: false,
-      timer: 1000,
-    }).then((result) => {
-      navigate("/culinaries");
-    });
+  const loadImage = (e) => {
+    const photo = e.target.files[0];
+    setPhoto(photo);
+    setPreview(URL.createObjectURL(photo));
   };
 
-  const loadImage = (e) => {
-    const image = e.target.files[0];
-    setPhoto(image);
-    setPreview(URL.createObjectURL(image));
+  // update
+  const update = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("urban_village", urban_village);
+    formData.append("address", address);
+    formData.append("lat", lat);
+    formData.append("long", long);
+    formData.append("price_range", price_range);
+    formData.append("open_time", open_time);
+    formData.append("category", category);
+    formData.append("photo", photo);
+
+    try {
+      var response = await axios.patch(
+        `http://localhost:2000/culinary/${id}`,
+        formData,
+        {
+          headers: {
+            "Content-type": "multipart/form-data",
+          },
+        }
+      );
+      Swal.fire({
+        title: "Good job!",
+        text: response.data.message,
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1000,
+      }).then((result) => {
+        navigate("/culinaries");
+      });
+    } catch (error) {
+      toast.error(error.response.data.message, {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
   };
+
   return (
     <>
+      <ToastContainer />;
       <Helmet>
         <title>SI-KUMAL | Edit</title>
       </Helmet>
@@ -104,7 +116,7 @@ const CulinaryEdit = () => {
             <FontAwesomeIcon icon={faArrowAltCircleLeft} fixedWidth />
             Back to Data List
           </Button>
-          <Form className="row g-3" onSubmit={store}>
+          <Form className="row g-3" onSubmit={update}>
             <Col md="12">
               <Form.Control required type="hidden" value={id} />
             </Col>

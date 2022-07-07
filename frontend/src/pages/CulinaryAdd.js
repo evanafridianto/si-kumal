@@ -65,7 +65,8 @@ const CulinaryAdd = () => {
         navigate("/culinaries");
       });
     } catch (error) {
-      toast.warn(error.response.data.message, {
+      console.log(error);
+      toast.error(error.response.data.message, {
         position: "top-right",
         autoClose: 4000,
         hideProgressBar: false,

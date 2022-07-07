@@ -12,9 +12,8 @@ import {
 const router = express.Router();
 router.get("/culinary", getAllData);
 router.get("/culinary/:id", getDataById);
-router.post("/culinary/create", validator, validateFile, result, createData);
-
-router.patch("/culinary/:id", updateData);
+router.post("/culinary/create", validator, result, validateFile, createData);
+router.patch("/culinary/:id", validator, result, validateFile, updateData);
 router.delete("/culinary/:id", deleteData);
 
 export default router;

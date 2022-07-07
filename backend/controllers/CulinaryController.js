@@ -20,21 +20,24 @@ export const getDataById = async (req, res) => {
         id: req.params.id,
       },
     });
-    res.json(data[0]);
+    return res.json(data[0]);
   } catch (error) {
-    res.json({ message: error.message });
+    return res.json({
+      message: error.message,
+    });
   }
 };
 
 export const createData = async (req, res) => {
   let fileName = "";
-  const image = req.files.photo;
-  const ext = path.extname(image.name);
-  fileName = image.md5 + ext;
-  image.mv(`./public/images/${fileName}`, async (err) => {
-    if (err) return res.status(500).json({ msg: err.message });
-  });
-
+  if (req.files !== null) {
+    const image = req.files.photo;
+    const ext = path.extname(image.name);
+    fileName = image.md5 + ext;
+    image.mv(`./public/images/${fileName}`, async (err) => {
+      if (err) return res.status(500).json({ msg: err.message });
+    });
+  }
   const name = req.body.name;
   const urban_village = req.body.urban_village;
   const address = req.body.address;
@@ -56,12 +59,14 @@ export const createData = async (req, res) => {
       category: category,
       photo: fileName,
     });
-    res.status(200).json({
-      success: true,
+    return res.status(200).json({
       message: "Data created successfully",
     });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    return res.json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
@@ -72,32 +77,20 @@ export const updateData = async (req, res) => {
     },
   });
 
-  if (!culinary) return res.status(404).json({ msg: "No Data Found" });
-
   let fileName = "";
-  if (req.files === null) {
-    fileName = culinary.photo;
-  } else {
-    const photo = req.files.photo;
-    const fileSize = photo.data.length;
-    const ext = path.extname(photo.name);
-    const allowedType = [".png", ".jpg", ".jpeg"];
+  if (req.files !== null) {
+    const image = req.files.photo;
+    const ext = path.extname(image.name);
+    fileName = image.md5 + ext;
 
-    fileName = photo.md5 + ext;
-
-    if (!allowedType.includes(ext.toLowerCase()))
-      return res.status(422).json({ msg: "Invalid Images" });
-    if (fileSize > 5000000)
-      return res.status(422).json({ msg: "Image must be less than 5 MB" });
+    image.mv(`./public/images/${fileName}`, async (err) => {
+      if (err) return res.status(500).json({ message: err.message });
+    });
 
     const filepath = `./public/images/${culinary.photo}`;
-    if (fs.existsSync(filepath)) {
+    if (culinary.photo !== "" && fs.existsSync(filepath)) {
       fs.unlinkSync(filepath);
     }
-
-    photo.mv(`./public/images/${fileName}`, (err) => {
-      if (err) return res.status(500).json({ msg: err.message });
-    });
   }
 
   const name = req.body.name;
@@ -128,12 +121,13 @@ export const updateData = async (req, res) => {
         },
       }
     );
-    res.json({
+    return res.json({
       message: "Data updated successfully!",
     });
   } catch (error) {
-    // res.json({ message: error.message });
-    console.log(error.message);
+    return res.json({
+      message: error.message,
+    });
   }
 };
 
@@ -154,11 +148,11 @@ export const deleteData = async (req, res) => {
           id: req.params.id,
         },
       });
-      res.json({
+      return res.json({
         message: "Data deleted successfully!",
       });
     } catch (error) {
-      res.json({ message: error.message });
+      return res.json({ message: error.message });
     }
   }
 };
