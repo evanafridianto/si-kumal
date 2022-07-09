@@ -24,8 +24,8 @@ const CulinaryMap = () => {
       </Helmet>
       <MapContainer center={center} zoom={14}>
         <TileLayer
-          attribution="&copy; <span>React GIS</span>"
-          url="http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {culinaries.map((culinary, index) => (
           <Marker key={culinary.id} position={[culinary.lat, culinary.long]}>
@@ -60,7 +60,7 @@ const CulinaryMap = () => {
                       <Image
                         className="img-thumbnail"
                         height={200}
-                        Width={150}
+                        width={150}
                         src={"http://localhost:2000/images/" + culinary.photo}
                         alt="file"
                       />

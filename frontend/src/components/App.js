@@ -7,6 +7,7 @@ import CulinaryEdit from "../pages/CulinaryEdit";
 import CulinaryAdd from "../pages/CulinaryAdd";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import React from "react";
+
 function App() {
   return (
     <>
